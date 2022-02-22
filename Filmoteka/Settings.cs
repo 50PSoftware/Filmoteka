@@ -39,20 +39,6 @@ namespace Filmoteka_WPF
         }
 
         [UserScopedSetting()]
-        [DefaultSettingValue("true")]
-        public bool TryMode
-        {
-            get
-            {
-                return (bool)this["TryMode"];
-            }
-            set
-            {
-                this["TryMode"] = (bool)value;
-            }
-        }
-
-        [UserScopedSetting()]
         [DefaultSettingValue("false")]
         public bool AllowExport
         {
@@ -80,23 +66,6 @@ namespace Filmoteka_WPF
             }
         }
 
-        [UserScopedSetting()]
-        [DefaultSettingValue("true")]
-        public bool FirstTime
-        {
-            get
-            {
-                return (bool)this["FirstTime"];
-            }
-            set
-            {
-                this["FirstTime"] = (bool)value;
-            }
-        }
-    }   
-
-    class ForTheFirstTime : SettingsBase
-    {
         [UserScopedSetting()]
         [DefaultSettingValue("true")]
         public bool FirstTime

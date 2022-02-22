@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Filmoteka_WPF"
-        xmlns:IPLocal="clr-namespace:_50P.Software.IPLocal;assembly=50P.Software.IPLocal" x:Class="Filmoteka_WPF.AddFilm"
+        x:Class="Filmoteka_WPF.AddFilm"
         mc:Ignorable="d"
         Title="AddFilm" Width="650" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Loaded="Window_Loaded" Height="328">
     <Grid >

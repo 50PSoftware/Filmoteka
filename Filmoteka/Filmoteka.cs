@@ -75,43 +75,24 @@ namespace Filmoteka_WPF
         private List<Film> _films = null;
         private string[] _zanry;
         private int[] _roky;
-        private DB _db = null;
-
-        /// <summary>
-        /// If True, operate with database
-        /// </summary>
-        public bool EditRemotely { get; set; }
 
         public string Folder { get; set; }
 
-        public Filmoteka(string FilenameOrConnectionString, bool UseDatabase = true, bool NewFile = false)
+        public Filmoteka(string FilenameOrConnectionString, bool NewFile = false)
         {
             _films = new List<Film>();
-            
-            if (UseDatabase)
+            LocalFiles localFiles = new LocalFiles(true);
+            XMLFile xmlFile = new XMLFile(FilenameOrConnectionString);
+            if (!NewFile)
             {
-                _db = new DB(FilenameOrConnectionString);
-                _films.AddRange(_db.GetFilms());
-                _zanry = _db.GetZanry();
-                _roky = _db.GetRoky();
+                xmlFile.Load(this);
             }
             else
             {
-                LocalFiles localFiles = new LocalFiles(true);
-                XMLFile xmlFile = new XMLFile(FilenameOrConnectionString);
-                if (!NewFile)
-                {
-                    xmlFile.Load(this);
-                }
-                else
-                {
-                    xmlFile.Save(this);
-                }
-                _zanry = localFiles.GetGenres();
-                _roky = localFiles.GetYears();
+                xmlFile.Save(this);
             }
-            
-            this.EditRemotely = false;
+            _zanry = localFiles.GetGenres();
+            _roky = localFiles.GetYears();
         }
 
         public void AutoAddFilms()
@@ -180,22 +161,9 @@ namespace Filmoteka_WPF
             return _roky;
         }
 
-        public string GetConnectionString()
-        {
-            return _db.GetConnectionString();
-        }
-
         public void AddFilm(Film film)
         {
             _films.Add(film);
-            if (EditRemotely)
-            {
-                if (_db != null)
-                {
-                    _db.Add(film);
-                    OnEditedRemotely(new FilmotekaEventArgs(film));
-                }
-            }
         }
         /// <summary>
         /// 
@@ -214,14 +182,6 @@ namespace Filmoteka_WPF
         {
             Film film = new Film(nazev, filename, zanry, rok, popis);
             _films.Add(film);
-            if (EditRemotely)
-            {
-                if (_db != null)
-                {
-                    _db.Add(film);
-                    OnEditedRemotely(new FilmotekaEventArgs(film));
-                }
-            }
         }
 
         public void UpdateFilm(Film film, string nazev, string filename, string popis, string[] zanry, int rok)
@@ -234,43 +194,18 @@ namespace Filmoteka_WPF
                 f.SetFilename(filename);
                 f.SetRok(rok);
                 f.SetZanr(new List<string>(zanry));
-
-                if (EditRemotely)
-                {
-                    if (_db != null)
-                    {
-                        _db.Update(f);
-                        OnEditedRemotely(new FilmotekaEventArgs(f));
-                    }
-                }
             }
         }
 
         public void RemoveFilm(Film film)
         {
             _films.Remove(film);
-            if (EditRemotely)
-            {
-                if (_db != null)
-                {
-                    _db.Delete(film);
-                    OnEditedRemotely(new FilmotekaEventArgs(film));
-                }
-            }
         }
 
         public void RemoveFilm(int index)
         {
             Film filmToDelete = _films[index];
             _films.RemoveAt(index);
-            if (EditRemotely)
-            {
-                if (_db != null)
-                {
-                    _db.Delete(filmToDelete);
-                    OnEditedRemotely(new FilmotekaEventArgs(filmToDelete));
-                }
-            }
         }
 
         protected virtual void OnFilmsAdded(FilmotekaEventArgs e)
@@ -282,16 +217,6 @@ namespace Filmoteka_WPF
             }
         }
 
-        protected virtual void OnEditedRemotely(FilmotekaEventArgs e)
-        {
-            EventHandler<FilmotekaEventArgs> handler = EditedRemotely;
-            if(handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        public event EventHandler<FilmotekaEventArgs> EditedRemotely;
         public event EventHandler<FilmotekaEventArgs> FilmsAutoAdded;
     }
 

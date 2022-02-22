@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using _50P.Software.Security.Password;
-using _50P.Software.Connect.MySql;
 
 namespace Filmoteka_WPF
 {
@@ -47,26 +46,16 @@ namespace Filmoteka_WPF
             tbFilm.Text = tbPopis.Text = tbRok.Text = tbZanr.Text = string.Empty;
         }
 
-        private void Load(string filenameOrConnectionString = null)
+        private void Load(string filename = null)
         {
             Title = "Filmotéka";
             EmptyTextBoxes();
             _settings.Reload();
-            if (string.IsNullOrEmpty(filenameOrConnectionString))
+            if (string.IsNullOrEmpty(filename))
             {
-                if (_settings.UseDatabase)
-                {
-                    ConnectMySQL connectMySQL = new ConnectMySQL(_settings.Server, _settings.Username, SecurePassword.GetUnprotectedPassword(_settings.Password));
-                    connectMySQL.setDatabase(_settings.DatabaseName);
-                    filenameOrConnectionString = connectMySQL.Connection;
-                }
-                else
-                {
-                    filenameOrConnectionString = _settings.Filename;
-                }
+                filename = _settings.Filename;
             }
-            _filmoteka = new Filmoteka(filenameOrConnectionString, _settings.UseDatabase);
-            _filmoteka.EditedRemotely += _filmoteka_EditedRemotely;
+            _filmoteka = new Filmoteka(filename);
             _filmoteka.FilmsAutoAdded += _filmoteka_FilmsAutoAdded;
 
             if (string.IsNullOrEmpty(_settings.Folder))
@@ -93,23 +82,15 @@ namespace Filmoteka_WPF
             }
 
             exportFileMenuItem.Visibility = _settings.AllowExport ? Visibility.Visible : Visibility.Collapsed;
-            fileMenuItem.Visibility = firstSeparatorMenuItem.Visibility = (_settings.AllowExport || !_settings.UseDatabase) && !_settings.TryMode ? Visibility.Visible : Visibility.Collapsed;
-            loadFileMenuItem.Visibility = saveFileMenuItem.Visibility = !_settings.UseDatabase ? Visibility.Visible : Visibility.Collapsed;
-            fileSeparatorMenuItem.Visibility = _settings.AllowExport && !_settings.UseDatabase ? Visibility.Visible : Visibility.Collapsed;
+            fileSeparatorMenuItem.Visibility = _settings.AllowExport ? Visibility.Visible : Visibility.Collapsed;
 
             btnEraseFilter.IsEnabled = false;
             listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
-            
         }
 
         private void _filmoteka_FilmsAutoAdded(object sender, FilmotekaEventArgs e)
         {
             MessageBox.Show("Byly automaticky přidány filmy!", String.Empty, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private void _filmoteka_EditedRemotely(object sender, FilmotekaEventArgs e)
-        {
-            MessageBox.Show("Proběhly změny v databázi!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Filter(object sender, RoutedEventArgs e)
@@ -246,16 +227,7 @@ namespace Filmoteka_WPF
             window.Filter = "XML File (*.xml)|*.xml";
             if (window.ShowDialog() == true)
             {
-                if (window.UseDatabase)
-                {
-                    ConnectMySQL connect = new ConnectMySQL(window.Server, window.Username, SecurePassword.GetUnprotectedPassword(window.Password));
-                    connect.setDatabase(window.DatabaseName);
-                    Load(connect.Connection);
-                }
-                else
-                {
-                    Load(window.Filename);
-                }
+                Load(window.Filename);
             }
         }
 
@@ -265,7 +237,6 @@ namespace Filmoteka_WPF
             addFilm.Title = "Přidat film";
             if(addFilm.ShowDialog() == true && addFilm.DialogResult == true)
             {
-                _filmoteka.EditRemotely = !_settings.TryMode;
                 _filmoteka.AddFilm(addFilm.FilmName, addFilm.Filename, addFilm.Describtion, addFilm.Genres, addFilm.Year);
                 EmptyTextBoxes();
                 listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
@@ -309,7 +280,6 @@ namespace Filmoteka_WPF
                 editFilm.Title = "Upravit film";
                 if(editFilm.ShowDialog() == true && editFilm.DialogResult == true)
                 {
-                    _filmoteka.EditRemotely = !_settings.TryMode;
                     _filmoteka.UpdateFilm(film, editFilm.FilmName, editFilm.Filename, editFilm.Describtion, editFilm.Genres, editFilm.Year);
                     EmptyTextBoxes();
                     listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
@@ -331,7 +301,6 @@ namespace Filmoteka_WPF
                 MessageBoxResult result = MessageBox.Show($"Chcete film {filmToRemove.Nazev} vymazat?", String.Empty, MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    _filmoteka.EditRemotely = !_settings.TryMode;
                     _filmoteka.RemoveFilm(filmToRemove);
                     EmptyTextBoxes();
                     listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
@@ -369,21 +338,12 @@ namespace Filmoteka_WPF
             {
                 _settings.FirstTime = false;
                 _settings.Save();
-                if (window.UseDatabase)
+                if (window.NewFile)
                 {
-                    ConnectMySQL connection = new ConnectMySQL(window.Server, window.Username, SecurePassword.GetUnprotectedPassword(window.Password));
-                    connection.setDatabase(window.DatabaseName);
-                    Load(connection.Connection);
+                    XMLFile file = new XMLFile(window.Filename);
+                    _filmoteka = new Filmoteka(window.Filename, true);
                 }
-                else
-                {
-                    if (window.NewFile)
-                    {
-                        XMLFile file = new XMLFile(window.Filename);
-                        _filmoteka = new Filmoteka(window.Filename, _settings.UseDatabase, true);
-                    }
-                    Load(window.Filename);
-                }
+                Load(window.Filename);
             }
             else
             {

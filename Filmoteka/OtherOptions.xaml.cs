@@ -28,10 +28,8 @@ namespace Filmoteka_WPF
             this.WindowStyle = WindowStyle.ToolWindow;
             _settings = new Settings();
             chbAtuoAdd.IsChecked = _settings.AutoAdd;
-            chbTryMode.IsChecked = _settings.TryMode;
             chbAllowExport.IsChecked = _settings.AllowExport;
             tbExport.IsEnabled = btnBrowse.IsEnabled = _settings.AllowExport;
-            chbLocalMode.IsChecked = _settings.UseDatabase == true ? false : true;
             tbFolder.Text = !string.IsNullOrEmpty(_settings.Folder) ? _settings.Folder : string.Empty;
             tbExport.Text = !string.IsNullOrEmpty(_settings.ExportFilename) ? _settings.ExportFilename : string.Empty;
         }
@@ -50,10 +48,8 @@ namespace Filmoteka_WPF
             this.DialogResult = true;
             _settings.Folder = tbFolder.Text;
             _settings.AutoAdd = chbAtuoAdd.IsChecked == true ? true : false;
-            _settings.TryMode = chbTryMode.IsChecked == true ? true : false;
             _settings.AllowExport = chbAllowExport.IsChecked == true ? true : false;
             _settings.ExportFilename = string.IsNullOrEmpty(tbExport.Text) ? null : tbExport.Text;
-            _settings.UseDatabase = chbLocalMode.IsChecked == true ? false : _settings.UseDatabase;
             _settings.Save();
             this.Close();
         }

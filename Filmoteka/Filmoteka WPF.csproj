@@ -60,12 +60,6 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="50P.Software.Connect.MySql">
-      <HintPath>..\..\50P.Software.Connect.MySql\50P.Software.Connect.MySql\bin\Release\50P.Software.Connect.MySql.dll</HintPath>
-    </Reference>
-    <Reference Include="50P.Software.IPLocal">
-      <HintPath>..\..\50P.Software.IPLocal\bin\Release\50P.Software.IPLocal.dll</HintPath>
-    </Reference>
     <Reference Include="50P.Software.Security.Password">
       <HintPath>..\..\50P.Software.Security.Password\50P.Software.Security.Password\bin\Release\50P.Software.Security.Password.dll</HintPath>
     </Reference>
@@ -130,7 +124,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DB.cs" />
     <Compile Include="Filmoteka.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
