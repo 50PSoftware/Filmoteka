@@ -344,6 +344,7 @@ namespace Filmoteka_WPF
         {
             XMLFile xmlFile = new XMLFile(_settings.Filename);
             xmlFile.Load(_filmoteka);
+            listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
             listBoxFilmy.Items.Refresh();
         }
 
