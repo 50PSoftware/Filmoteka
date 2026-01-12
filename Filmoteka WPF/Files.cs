@@ -15,21 +15,20 @@ namespace Filmoteka_WPF
 
     internal class JSONFile : IFilesable
     {
-        private string filename;
+        private string _filename;
 
         public JSONFile(string filename)
         {
-            this.filename = filename;
+            this._filename = filename;
         }
 
         public void Load(Filmoteka filmoteka)
         {
             filmoteka.Clear();
-            using (var file = new StreamReader(File.OpenRead(filename)))
+            using (var file = new StreamReader(File.OpenRead(_filename)))
             {
                 var films = JsonSerializer.Deserialize<Film[]>(file.ReadToEnd());
                 filmoteka.AddRange(films);
-                file.Flush();
             }
         }
 
@@ -37,7 +36,7 @@ namespace Filmoteka_WPF
         {
             var films = filmoteka.GetFilms();
             var jsonObj = JsonSerializer.Serialize<Film[]>(films);
-            using (var file = new StreamWriter(File.OpenWrite(filename)))
+            using (var file = new StreamWriter(File.OpenWrite(_filename)))
             {
                 file.Write(jsonObj);
                 file.Flush();
@@ -47,19 +46,19 @@ namespace Filmoteka_WPF
 
     internal class LocalFiles
     {
-        private string[] genres;
-        private int[] years;
+        private string[] _genres;
+        private int[] _years;
 
         public LocalFiles(bool useResources = false)
         {
             if (useResources)
             {
-                genres = Properties.Resources.Genres.Split(',');
+                _genres = Properties.Resources.Genres.Split(',');
                 var years = Properties.Resources.Years.Split(',');
-                years = new int[years.Length];
+                _years = new int[years.Length];
                 for (int index = 0; index < years.Length; index++)
                 {
-                    years[index] = Convert.ToInt32(years[index]);
+                    _years[index] = Convert.ToInt32(years[index]);
                 }
             }
         }
@@ -67,7 +66,7 @@ namespace Filmoteka_WPF
         private string PrintGenres()
         {
             var sb = new StringBuilder();
-            foreach (string genre in genres)
+            foreach (string genre in _genres)
             {
                 sb.AppendLine($"Žánr: {genre} ({genre.Length})");
             }
@@ -76,33 +75,33 @@ namespace Filmoteka_WPF
 
         public string[] GetGenres()
         {
-            return genres;
+            return _genres;
         }
 
         public int[] GetYears()
         {
-            return years;
+            return _years;
         }
     }
 
     internal class XMLFile : IFilesable
     {
-        private Stream file;
-        private string filename;
+        private Stream _file;
+        private string _filename;
 
         public XMLFile(string filename)
         {
-            this.filename = filename;
+            this._filename = filename;
         }
 
         public void Load(Filmoteka filmoteka)
         {
             filmoteka.Clear();
-            using (file = File.OpenRead(filename))
+            using (_file = File.OpenRead(_filename))
             {
                 var reader = new XmlSerializer(typeof(Film[]));
                 var films = (Film[])reader.Deserialize(_file);
-                file.Flush();
+                _file.Flush();
                 filmoteka.AddRange(films);
             }
         }
@@ -110,11 +109,11 @@ namespace Filmoteka_WPF
         public void Save(Filmoteka filmoteka)
         {
             var films = filmoteka.GetFilms();
-            using (file = File.Create(filename))
+            using (_file = File.Create(_filename))
             {
                 var writer = new XmlSerializer(typeof(Film[]));
-                writer.Serialize(file, films);
-                file.Flush();
+                writer.Serialize(_file, films);
+                _file.Flush();
             }
         }
     }

@@ -7,13 +7,13 @@ namespace Filmoteka_WPF
 {
     internal class Filmoteka
     {
-        private List<Film> films = null;
-        private int[] roky;
-        private string[] zanry;
+        private List<Film> _films = null;
+        private int[] _years;
+        private string[] _genres;
 
         public Filmoteka(string FilenameOrConnectionString, bool NewFile = false)
         {
-            films = new List<Film>();
+            _films = new List<Film>();
             LocalFiles localFiles = new LocalFiles(true);
             if (NewFile)
             {
@@ -28,8 +28,8 @@ namespace Filmoteka_WPF
                         break;
                 }
             }
-            zanry = localFiles.GetGenres();
-            roky = localFiles.GetYears();
+            _genres = localFiles.GetGenres();
+            _years = localFiles.GetYears();
         }
 
         public event EventHandler<FilmotekaEventArgs> FilmsAutoAdded;
@@ -47,21 +47,21 @@ namespace Filmoteka_WPF
 
         public void AddFilm(Film film)
         {
-            films.Add(film);
+            _films.Add(film);
         }
 
         public void AddFilm(string nazev, string filename, string popis, string[] zanry, int rok)
         {
             Film film = new Film(nazev, filename, zanry, rok, popis);
-            films.Add(film);
+            _films.Add(film);
         }
 
         public void AddRange(Film[] films)
         {
-            if (this.films.Count == 0)
-                this.films.AddRange(films);
+            if (this._films.Count == 0)
+                this._films.AddRange(films);
             else
-                throw new Exception($"Films collection is not empty! Count: {this.films.Count}");
+                throw new Exception($"Films collection is not empty! Count: {this._films.Count}");
         }
 
         public void AutoAddFilms()
@@ -70,26 +70,26 @@ namespace Filmoteka_WPF
             foreach (Film film in films)
             {
                 bool isAlreadyInFileOrDatabase = false;
-                var query = from _film in this.films where _film.Filename == film.Filename select _film;
+                var query = from _film in this._films where _film.Filename == film.Filename select _film;
                 foreach (Film filmQuery in query)
                 {
                     System.Windows.MessageBox.Show($"Tento film ({film.Nazev}) je již v databázi!");
                     isAlreadyInFileOrDatabase = true;
                 }
                 if (!isAlreadyInFileOrDatabase)
-                    this.films.Add(film);
+                    this._films.Add(film);
             }
             OnFilmsAdded(new FilmotekaEventArgs(films));
         }
 
         public void Clear()
         {
-            films.Clear();
+            _films.Clear();
         }
 
         public Film[] GetFilms()
         {
-            return films.ToArray();
+            return _films.ToArray();
         }
 
         public Film[] GetFilmsByGenre(string[] zanr)
@@ -97,7 +97,7 @@ namespace Filmoteka_WPF
             List<Film> result = new List<Film>();
             for (int i = 0; i < zanr.Length; i++)
             {
-                var query = from film in films where film.Zanr.Contains(zanr[i]) select film;
+                var query = from film in _films where film.Zanr.Contains(zanr[i]) select film;
                 foreach (Film f in query)
                 {
                     if (!result.Contains(f))
@@ -111,7 +111,7 @@ namespace Filmoteka_WPF
 
         public Film[] GetFilmsByYear(int rok)
         {
-            var query = from film in films where film.Rok == rok select film;
+            var query = from film in _films where film.Rok == rok select film;
             List<Film> result = new List<Film>();
             foreach (Film film1 in query)
             {
@@ -122,28 +122,28 @@ namespace Filmoteka_WPF
 
         public int[] GetRoky()
         {
-            return roky;
+            return _years;
         }
 
         public string[] GetZanry()
         {
-            return zanry;
+            return _genres;
         }
 
         public void RemoveFilm(Film film)
         {
-            films.Remove(film);
+            _films.Remove(film);
         }
 
         public void RemoveFilm(int index)
         {
-            Film filmToDelete = films[index];
-            films.RemoveAt(index);
+            Film filmToDelete = _films[index];
+            _films.RemoveAt(index);
         }
 
         public void UpdateFilm(Film film, string nazev, string filename, string popis, string[] zanry, int rok)
         {
-            var query = from _film in films where _film.Filename == film.Filename select _film;
+            var query = from _film in _films where _film.Filename == film.Filename select _film;
             foreach (Film f in query)
             {
                 f.SetNazev(nazev);

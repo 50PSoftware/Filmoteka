@@ -10,16 +10,16 @@ namespace Filmoteka_WPF
 {
     public partial class MainWindow : Window
     {
-        private Filmoteka filmoteka;
-        private string path;
-        private bool selectionChanged;
-        private Settings settings;
-        private List<string> vyber = new List<string>();
+        private Filmoteka _filmoteka;
+        private string _path;
+        private bool _selectionChanged;
+        private Settings _settings;
+        private List<string> _selections = new List<string>();
 
         public MainWindow()
         {
-            settings = new Settings();
-            if (settings.FirstTime)
+            _settings = new Settings();
+            if (_settings.FirstTime)
             {
                 FirstRun();
             }
@@ -32,13 +32,13 @@ namespace Filmoteka_WPF
 
         private void AddFilm_Click(object sender, RoutedEventArgs e)
         {
-            AddFilm addFilm = new AddFilm(filmoteka.GetZanry(), filmoteka.GetRoky());
+            AddFilm addFilm = new AddFilm(_filmoteka.GetZanry(), _filmoteka.GetRoky());
             addFilm.Title = "Přidat film";
             if (addFilm.ShowDialog() == true && addFilm.DialogResult == true)
             {
-                filmoteka.AddFilm(addFilm.FilmName, addFilm.Filename, addFilm.Describtion, addFilm.Genres, addFilm.Year);
+                _filmoteka.AddFilm(addFilm.FilmName, addFilm.Filename, addFilm.Describtion, addFilm.Genres, addFilm.Year);
                 EmptyTextBoxes();
-                listBoxFilmy.ItemsSource = filmoteka.GetFilms();
+                listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
                 listBoxFilmy.Items.Refresh();
             }
         }
@@ -46,9 +46,9 @@ namespace Filmoteka_WPF
         private void BtnEraseFilter_Click(object sender, RoutedEventArgs e)
         {
             EmptyTextBoxes();
-            listBoxFilmy.ItemsSource = filmoteka.GetFilms();
+            listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
             listBoxFilmy.Items.Refresh();
-            foreach (string v in vyber)
+            foreach (string v in _selections)
             {
                 foreach (ComboBoxItem it in comboBoxFilterBy.Items)
                 {
@@ -58,7 +58,7 @@ namespace Filmoteka_WPF
                     }
                 }
             }
-            vyber.Clear();
+            _selections.Clear();
             btnEraseFilter.IsEnabled = false;
             comboBoxFilter.Text = string.Empty;
             comboBoxFilterBy.SelectedItem = null;
@@ -67,10 +67,10 @@ namespace Filmoteka_WPF
         private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
             Film film = (Film)listBoxFilmy.SelectedItem;
-            path = settings.Folder;
+            _path = _settings.Folder;
             try
             {
-                string pathToFilm = path + @"\" + film.Filename;
+                string pathToFilm = _path + @"\" + film.Filename;
                 MessageBoxResult res = MessageBox.Show($"Chcete pustit film:\n {film.Nazev}?", "Otázka", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (res == MessageBoxResult.Yes)
                 {
@@ -92,7 +92,7 @@ namespace Filmoteka_WPF
             switch (comboBoxFilter.SelectedIndex)
             {
                 case 0:
-                    foreach (int rok in filmoteka.GetRoky())
+                    foreach (int rok in _filmoteka.GetRoky())
                     {
                         ComboBoxItem item = new ComboBoxItem();
                         item.Content = rok;
@@ -101,7 +101,7 @@ namespace Filmoteka_WPF
                     break;
 
                 case 1:
-                    foreach (string zanr in filmoteka.GetZanry())
+                    foreach (string zanr in _filmoteka.GetZanry())
                     {
                         ComboBoxItem item = new ComboBoxItem();
                         item.Content = zanr;
@@ -134,7 +134,7 @@ namespace Filmoteka_WPF
             {
                 if (comboBoxFilter.SelectedIndex == 1)
                 {
-                    selectionChanged = true;
+                    _selectionChanged = true;
                 }
             }
         }
@@ -148,13 +148,13 @@ namespace Filmoteka_WPF
             else
             {
                 Film film = (Film)listBoxFilmy.SelectedItem;
-                AddFilm editFilm = new AddFilm(filmoteka.GetZanry(), filmoteka.GetRoky(), film.Nazev, film.Filename, film.Rok, film.Zanr.ToArray(), film.Popis);
+                AddFilm editFilm = new AddFilm(_filmoteka.GetZanry(), _filmoteka.GetRoky(), film.Nazev, film.Filename, film.Rok, film.Zanr.ToArray(), film.Popis);
                 editFilm.Title = "Upravit film";
                 if (editFilm.ShowDialog() == true && editFilm.DialogResult == true)
                 {
-                    filmoteka.UpdateFilm(film, editFilm.FilmName, editFilm.Filename, editFilm.Describtion, editFilm.Genres, editFilm.Year);
+                    _filmoteka.UpdateFilm(film, editFilm.FilmName, editFilm.Filename, editFilm.Describtion, editFilm.Genres, editFilm.Year);
                     EmptyTextBoxes();
-                    listBoxFilmy.ItemsSource = filmoteka.GetFilms();
+                    listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
                     listBoxFilmy.Items.Refresh();
                 }
             }
@@ -167,17 +167,17 @@ namespace Filmoteka_WPF
 
         private void ExportFile_Click(object sender, RoutedEventArgs e)
         {
-            if (settings.AllowExport)
+            if (_settings.AllowExport)
             {
-                Export export = new Export(filmoteka);
-                switch (settings.ExportFileExtension)
+                Export export = new Export(_filmoteka);
+                switch (_settings.ExportFileExtension)
                 {
                     case ".xml":
-                        export.ToXML(settings.ExportFilename);
+                        export.ToXML(_settings.ExportFilename);
                         break;
 
                     case ".json":
-                        export.ToJSON(settings.ExportFilename);
+                        export.ToJSON(_settings.ExportFilename);
                         break;
                 }
                 MessageBox.Show($"Data byla exportována!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -199,11 +199,11 @@ namespace Filmoteka_WPF
             switch (comboBoxFilter.SelectedIndex)
             {
                 case 0:
-                    listBoxFilmy.ItemsSource = filmoteka.GetFilmsByYear((int)((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content);
+                    listBoxFilmy.ItemsSource = _filmoteka.GetFilmsByYear((int)((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content);
                     break;
 
                 case 1:
-                    listBoxFilmy.ItemsSource = filmoteka.GetFilmsByGenre(vyber.ToArray());
+                    listBoxFilmy.ItemsSource = _filmoteka.GetFilmsByGenre(_selections.ToArray());
                     break;
             }
             btnEraseFilter.IsEnabled = true;
@@ -211,28 +211,28 @@ namespace Filmoteka_WPF
 
         private void FilterSelectionHandler()
         {
-            string vyb = vyber.Find(x => x.Contains(((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content.ToString()));
-            if ((selectionChanged && string.IsNullOrEmpty(vyb)) || string.IsNullOrEmpty(vyb))
+            string vyb = _selections.Find(x => x.Contains(((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content.ToString()));
+            if ((_selectionChanged && string.IsNullOrEmpty(vyb)) || string.IsNullOrEmpty(vyb))
             {
-                vyber.Add(((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content.ToString());
+                _selections.Add(((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content.ToString());
                 ((ComboBoxItem)comboBoxFilterBy.SelectedItem).Foreground = System.Windows.Media.Brushes.Red;
             }
             else
             {
-                vyber.Remove(((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content.ToString());
+                _selections.Remove(((ComboBoxItem)comboBoxFilterBy.SelectedItem).Content.ToString());
                 ((ComboBoxItem)comboBoxFilterBy.SelectedItem).Foreground = System.Windows.Media.Brushes.Black;
             }
-            selectionChanged = false;
+            _selectionChanged = false;
         }
 
         private void FirstRun()
         {
-            SettingsDialog window = new SettingsDialog(settings, null, TypeOfStorage.FileOnly);
+            SettingsDialog window = new SettingsDialog(_settings, null, TypeOfStorage.FileOnly);
             window.Filter = "XML File (*.xml)|*.xml|JSON File (*.json)|*.json";
             if (window.ShowDialog() == true)
             {
-                settings.FirstTime = false;
-                settings.Save();
+                _settings.FirstTime = false;
+                _settings.Save();
                 InitializeComponent();
                 Load(window.Filename, window.NewFile);
             }
@@ -244,7 +244,7 @@ namespace Filmoteka_WPF
 
         private void CheckIfFileExists(string filename = null)
         {
-            string _filename = (filename == null) ? settings.Filename : filename;
+            string _filename = (filename == null) ? _settings.Filename : filename;
             if (string.IsNullOrEmpty(_filename) || !File.Exists(_filename))
             {
                 MessageBox.Show("Soubor neexistuje nebo není nastavena cesta k souboru s daty!", "Chyba", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -269,9 +269,13 @@ namespace Filmoteka_WPF
                 foreach (string z in film.Zanr)
                 {
                     if (film.Zanr.IndexOf(z) == film.Zanr.Count - 1)
+                    {
                         tbZanr.Text += z;
+                    }
                     else
+                    {
                         tbZanr.Text += $"{z} \\ ";
+                    }
                 }
             }
         }
@@ -280,33 +284,33 @@ namespace Filmoteka_WPF
         {
             Title = "Filmotéka";
             EmptyTextBoxes();
-            settings.Reload();
+            _settings.Reload();
             if (!newFile) CheckIfFileExists(filename);
             if (string.IsNullOrEmpty(filename))
             {
-                filename = settings.Filename;
+                filename = _settings.Filename;
             }
 
-            filmoteka = new Filmoteka(filename, newFile);
-            filmoteka.FilmsAutoAdded += Filmoteka_FilmsAutoAdded;
+            _filmoteka = new Filmoteka(filename, newFile);
+            _filmoteka.FilmsAutoAdded += Filmoteka_FilmsAutoAdded;
 
-            if (string.IsNullOrEmpty(settings.Folder))
+            if (string.IsNullOrEmpty(_settings.Folder))
             {
                 OtherOptions window = new OtherOptions();
                 if (window.ShowDialog() == true)
                 {
-                    settings.Reload();
-                    filmoteka.Folder = settings.Folder;
+                    _settings.Reload();
+                    _filmoteka.Folder = _settings.Folder;
                 }
             }
             else
             {
-                filmoteka.Folder = settings.Folder;
+                _filmoteka.Folder = _settings.Folder;
             }
 
-            if (settings.AutoAdd)
+            if (_settings.AutoAdd)
             {
-                filmoteka.AutoAddFilms();
+                _filmoteka.AutoAddFilms();
                 addFilmMenuItem.Visibility = Visibility.Collapsed;
             }
             else
@@ -314,28 +318,28 @@ namespace Filmoteka_WPF
                 addFilmMenuItem.Visibility = Visibility.Visible;
             }
 
-            exportFileMenuItem.Visibility = settings.AllowExport ? Visibility.Visible : Visibility.Collapsed;
-            fileSeparatorMenuItem.Visibility = settings.AllowExport ? Visibility.Visible : Visibility.Collapsed;
+            exportFileMenuItem.Visibility = _settings.AllowExport ? Visibility.Visible : Visibility.Collapsed;
+            fileSeparatorMenuItem.Visibility = _settings.AllowExport ? Visibility.Visible : Visibility.Collapsed;
 
             btnEraseFilter.IsEnabled = false;
-            listBoxFilmy.ItemsSource = filmoteka.GetFilms();
+            listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
         }
 
         private void LoadFile_Click(object sender, RoutedEventArgs e)
         {
             CheckIfFileExists();
-            switch (settings.FileExtension)
+            switch (_settings.FileExtension)
             {
                 case ".xml":
-                    new XMLFile(settings.Filename).Load(filmoteka);
+                    new XMLFile(_settings.Filename).Load(_filmoteka);
                     break;
 
                 case ".json":
-                    new JSONFile(settings.Filename).Load(filmoteka);
+                    new JSONFile(_settings.Filename).Load(_filmoteka);
                     break;
             }
 
-            listBoxFilmy.ItemsSource = filmoteka.GetFilms();
+            listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
             listBoxFilmy.Items.Refresh();
         }
 
@@ -352,9 +356,9 @@ namespace Filmoteka_WPF
                 MessageBoxResult result = MessageBox.Show($"Chcete film {filmToRemove.Nazev} vymazat?", string.Empty, MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    filmoteka.RemoveFilm(filmToRemove);
+                    _filmoteka.RemoveFilm(filmToRemove);
                     EmptyTextBoxes();
-                    listBoxFilmy.ItemsSource = filmoteka.GetFilms();
+                    listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
                     listBoxFilmy.Items.Refresh();
                 }
             }
@@ -363,14 +367,14 @@ namespace Filmoteka_WPF
         private void SaveFile_Click(object sender, RoutedEventArgs e)
         {
             CheckIfFileExists();
-            switch (settings.FileExtension)
+            switch (_settings.FileExtension)
             {
                 case ".xml":
-                    new XMLFile(settings.Filename).Save(filmoteka);
+                    new XMLFile(_settings.Filename).Save(_filmoteka);
                     break;
 
                 case ".json":
-                    new JSONFile(settings.Filename).Save(filmoteka);
+                    new JSONFile(_settings.Filename).Save(_filmoteka);
                     break;
             }
         }
@@ -382,7 +386,7 @@ namespace Filmoteka_WPF
 
         private void ShowSettingsDialogue()
         {
-            SettingsDialog window = new SettingsDialog(settings, new OtherOptions(), TypeOfStorage.FileOnly);
+            SettingsDialog window = new SettingsDialog(_settings, new OtherOptions(), TypeOfStorage.FileOnly);
             window.Filter = "XML File (*.xml)|*.xml|JSON File (*.json)|*.json";
             if (window.ShowDialog() == true)
             {

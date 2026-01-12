@@ -14,6 +14,7 @@ namespace Filmoteka_WPF
                 FileInfo info = new FileInfo(filenames[index]);
                 films[index] = new Film(info.Name, filenames[index], new List<string>(), 0, string.Empty);
             }
+
             return films;
         }
 
@@ -26,6 +27,8 @@ namespace Filmoteka_WPF
             {
                 files.Add(file.Name);
             }
+
+
             foreach (DirectoryInfo subdir in subFolders)
             {
                 foreach (FileInfo info in subdir.GetFiles())
@@ -34,6 +37,7 @@ namespace Filmoteka_WPF
                     files.Add(path);
                 }
             }
+
             return files.ToArray();
         }
     }

@@ -2,23 +2,23 @@
 {
     internal class Export
     {
-        private readonly Filmoteka source;
+        private readonly Filmoteka _source;
 
         public Export(Filmoteka source)
         {
-            this.source = source;
+            this._source = source;
         }
 
         public void ToJSON(string exportFilename)
         {
             JSONFile json = new JSONFile(exportFilename);
-            json.Save(source);
+            json.Save(_source);
         }
 
         public void ToXML(string exportFilename)
         {
             XMLFile xml = new XMLFile(exportFilename);
-            xml.Save(source);
+            xml.Save(_source);
         }
     }
 }
