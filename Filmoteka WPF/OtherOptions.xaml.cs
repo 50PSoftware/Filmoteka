@@ -70,7 +70,7 @@ namespace Filmoteka_WPF
             tbExport.IsEnabled = btnBrowse.IsEnabled = chbAllowExport.IsChecked == true ? true : false;
             if (chbAllowExport.IsChecked == false)
             {
-                tbExport.Text = String.Empty;
+                tbExport.Text = string.Empty;
                 btnOk.IsEnabled = true;
             }
             else

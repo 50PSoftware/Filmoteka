@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using _50P.Software.Settings.Dialogs;
 
 namespace Filmoteka_WPF
 {
@@ -17,7 +18,6 @@ namespace Filmoteka_WPF
 
         public MainWindow()
         {
-            InitializeComponent();
             settings = new Settings();
             if (settings.FirstTime)
             {
@@ -25,6 +25,7 @@ namespace Filmoteka_WPF
             }
             else
             {
+                InitializeComponent();
                 Load();
             }
         }
@@ -51,7 +52,7 @@ namespace Filmoteka_WPF
             {
                 foreach (ComboBoxItem it in comboBoxFilterBy.Items)
                 {
-                    if (it.Content == v)
+                    if ((string)it.Content == v)
                     {
                         it.Foreground = System.Windows.Media.Brushes.Black;
                     }
@@ -69,11 +70,11 @@ namespace Filmoteka_WPF
             path = settings.Folder;
             try
             {
-                string path_to_film = path + @"\" + film.Filename;
+                string pathToFilm = path + @"\" + film.Filename;
                 MessageBoxResult res = MessageBox.Show($"Chcete pustit film:\n {film.Nazev}?", "Otázka", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (res == MessageBoxResult.Yes)
                 {
-                    Process.Start(path_to_film);
+                    Process.Start(pathToFilm);
                 }
             }
             catch (Exception ex)
@@ -226,13 +227,13 @@ namespace Filmoteka_WPF
 
         private void FirstRun()
         {
-            _50P.Software.Settings.Dialogs.SettingsDialog window = new _50P.Software.Settings.Dialogs.SettingsDialog(settings, new OtherOptions(), _50P.Software.Settings.Dialogs.TypeOfStorage.FileOnly);
+            SettingsDialog window = new SettingsDialog(settings, null, TypeOfStorage.FileOnly);
             window.Filter = "XML File (*.xml)|*.xml|JSON File (*.json)|*.json";
-            window.ShowDialog();
-            if (window.DialogResult == true)
+            if (window.ShowDialog() == true)
             {
                 settings.FirstTime = false;
                 settings.Save();
+                InitializeComponent();
                 Load(window.Filename, window.NewFile);
             }
             else
@@ -280,19 +281,19 @@ namespace Filmoteka_WPF
             Title = "Filmotéka";
             EmptyTextBoxes();
             settings.Reload();
-            if (!newFile)
-                CheckIfFileExists(filename);
+            if (!newFile) CheckIfFileExists(filename);
             if (string.IsNullOrEmpty(filename))
             {
                 filename = settings.Filename;
             }
+
             filmoteka = new Filmoteka(filename, newFile);
             filmoteka.FilmsAutoAdded += Filmoteka_FilmsAutoAdded;
 
             if (string.IsNullOrEmpty(settings.Folder))
             {
                 OtherOptions window = new OtherOptions();
-                if (window.ShowDialog() == true && window.DialogResult == true)
+                if (window.ShowDialog() == true)
                 {
                     settings.Reload();
                     filmoteka.Folder = settings.Folder;
@@ -302,6 +303,7 @@ namespace Filmoteka_WPF
             {
                 filmoteka.Folder = settings.Folder;
             }
+
             if (settings.AutoAdd)
             {
                 filmoteka.AutoAddFilms();
@@ -332,6 +334,7 @@ namespace Filmoteka_WPF
                     new JSONFile(settings.Filename).Load(filmoteka);
                     break;
             }
+
             listBoxFilmy.ItemsSource = filmoteka.GetFilms();
             listBoxFilmy.Items.Refresh();
         }
@@ -346,7 +349,7 @@ namespace Filmoteka_WPF
             else
             {
                 Film filmToRemove = (Film)listBoxFilmy.SelectedItem;
-                MessageBoxResult result = MessageBox.Show($"Chcete film {filmToRemove.Nazev} vymazat?", String.Empty, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult result = MessageBox.Show($"Chcete film {filmToRemove.Nazev} vymazat?", string.Empty, MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     filmoteka.RemoveFilm(filmToRemove);
@@ -379,7 +382,7 @@ namespace Filmoteka_WPF
 
         private void ShowSettingsDialogue()
         {
-            _50P.Software.Settings.Dialogs.SettingsDialog window = new _50P.Software.Settings.Dialogs.SettingsDialog(settings, new OtherOptions(), _50P.Software.Settings.Dialogs.TypeOfStorage.FileOnly);
+            SettingsDialog window = new SettingsDialog(settings, new OtherOptions(), TypeOfStorage.FileOnly);
             window.Filter = "XML File (*.xml)|*.xml|JSON File (*.json)|*.json";
             if (window.ShowDialog() == true)
             {
