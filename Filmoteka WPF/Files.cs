@@ -36,7 +36,7 @@ namespace Filmoteka_WPF
         {
             var films = filmoteka.GetFilms();
             var jsonObj = JsonSerializer.Serialize<Film[]>(films);
-            using (var file = new StreamWriter(File.OpenWrite(_filename)))
+            using (var file = new StreamWriter(File.Create(_filename)))
             {
                 file.Write(jsonObj);
                 file.Flush();

@@ -28,6 +28,7 @@ namespace Filmoteka_WPF
                         break;
                 }
             }
+
             _genres = localFiles.GetGenres();
             _years = localFiles.GetYears();
         }
@@ -50,9 +51,9 @@ namespace Filmoteka_WPF
             _films.Add(film);
         }
 
-        public void AddFilm(string nazev, string filename, string popis, string[] zanry, int rok)
+        public void AddFilm(string name, string filename, string description, string[] genres, int year)
         {
-            Film film = new Film(nazev, filename, zanry, rok, popis);
+            Film film = new Film(name, filename, genres, year, description);
             _films.Add(film);
         }
 
@@ -73,12 +74,13 @@ namespace Filmoteka_WPF
                 var query = from _film in this._films where _film.Filename == film.Filename select _film;
                 foreach (Film filmQuery in query)
                 {
-                    System.Windows.MessageBox.Show($"Tento film ({film.Nazev}) je již v databázi!");
+                    System.Windows.MessageBox.Show($"Tento film ({film.Name}) je již v databázi!");
                     isAlreadyInFileOrDatabase = true;
                 }
                 if (!isAlreadyInFileOrDatabase)
                     this._films.Add(film);
             }
+
             OnFilmsAdded(new FilmotekaEventArgs(films));
         }
 
@@ -97,7 +99,7 @@ namespace Filmoteka_WPF
             List<Film> result = new List<Film>();
             for (int i = 0; i < zanr.Length; i++)
             {
-                var query = from film in _films where film.Zanr.Contains(zanr[i]) select film;
+                var query = from film in _films where film.Genres.Contains(zanr[i]) select film;
                 foreach (Film f in query)
                 {
                     if (!result.Contains(f))
@@ -106,26 +108,28 @@ namespace Filmoteka_WPF
                     }
                 }
             }
+
             return result.ToArray();
         }
 
         public Film[] GetFilmsByYear(int rok)
         {
-            var query = from film in _films where film.Rok == rok select film;
+            var query = from film in _films where film.Year == rok select film;
             List<Film> result = new List<Film>();
             foreach (Film film1 in query)
             {
                 result.Add(film1);
             }
+
             return result.ToArray();
         }
 
-        public int[] GetRoky()
+        public int[] GetYears()
         {
             return _years;
         }
 
-        public string[] GetZanry()
+        public string[] GetGenres()
         {
             return _genres;
         }
@@ -141,53 +145,53 @@ namespace Filmoteka_WPF
             _films.RemoveAt(index);
         }
 
-        public void UpdateFilm(Film film, string nazev, string filename, string popis, string[] zanry, int rok)
+        public void UpdateFilm(Film film, string name, string filename, string description, string[] genres, int year)
         {
             var query = from _film in _films where _film.Filename == film.Filename select _film;
             foreach (Film f in query)
             {
-                f.SetNazev(nazev);
-                f.SetPopis(popis);
+                f.SetName(name);
+                f.SetDescription(description);
                 f.SetFilename(filename);
-                f.SetRok(rok);
-                f.SetZanr(new List<string>(zanry));
+                f.SetYear(year);
+                f.SetGenres(new List<string>(genres));
             }
         }
     }
 
     public class Film
     {
-        public Film(string nazev, string filename, List<string> zanr, int rok, string popis)
+        public Film(string name, string filename, List<string> genres, int year, string description)
         {
-            this.Nazev = nazev;
+            this.Name = name;
             this.Filename = filename;
-            this.Rok = rok;
-            this.Zanr = zanr;
-            this.Popis = popis;
+            this.Year = year;
+            this.Genres = genres;
+            this.Description = description;
         }
 
-        public Film(string nazev, string filename, string[] zanry, int rok, string popis)
+        public Film(string name, string filename, string[] genres, int year, string description)
         {
-            this.Nazev = nazev;
+            this.Name = name;
             this.Filename = filename;
-            this.Rok = rok;
-            this.Popis = popis;
-            this.Zanr = new List<string>();
-            this.Zanr.AddRange(zanry);
+            this.Year = year;
+            this.Description = description;
+            this.Genres = new List<string>();
+            this.Genres.AddRange(genres);
         }
 
         public Film()
         { }
 
-        public string Filename { get; set; }
-        public string Nazev { get; set; }
-        public string Popis { get; set; }
-        public int Rok { get; set; }
-        public List<string> Zanr { get; set; }
+        public string Filename { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public int Year { get; private set; }
+        public List<string> Genres { get; private set; }
 
-        public void AddZanr(string zanr)
+        public void AddGenre(string zanr)
         {
-            Zanr.Add(zanr);
+            Genres.Add(zanr);
         }
 
         public void SetFilename(string filename)
@@ -195,29 +199,29 @@ namespace Filmoteka_WPF
             this.Filename = filename;
         }
 
-        public void SetNazev(string nazev)
+        public void SetName(string nazev)
         {
-            this.Nazev = nazev;
+            this.Name = nazev;
         }
 
-        public void SetPopis(string popis)
+        public void SetDescription(string popis)
         {
-            this.Popis = popis;
+            this.Description = popis;
         }
 
-        public void SetRok(int rok)
+        public void SetYear(int rok)
         {
-            this.Rok = rok;
+            this.Year = rok;
         }
 
-        public void SetZanr(List<string> zanr)
+        public void SetGenres(List<string> zanr)
         {
-            this.Zanr = zanr;
+            this.Genres = zanr;
         }
 
         public override string ToString()
         {
-            return this.Nazev;
+            return this.Name;
         }
     }
 

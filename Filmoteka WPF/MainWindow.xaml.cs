@@ -32,7 +32,7 @@ namespace Filmoteka_WPF
 
         private void AddFilm_Click(object sender, RoutedEventArgs e)
         {
-            AddFilm addFilm = new AddFilm(_filmoteka.GetZanry(), _filmoteka.GetRoky());
+            AddFilm addFilm = new AddFilm(_filmoteka.GetGenres(), _filmoteka.GetYears());
             addFilm.Title = "Přidat film";
             if (addFilm.ShowDialog() == true && addFilm.DialogResult == true)
             {
@@ -71,7 +71,7 @@ namespace Filmoteka_WPF
             try
             {
                 string pathToFilm = _path + @"\" + film.Filename;
-                MessageBoxResult res = MessageBox.Show($"Chcete pustit film:\n {film.Nazev}?", "Otázka", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult res = MessageBox.Show($"Chcete pustit film:\n {film.Name}?", "Otázka", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (res == MessageBoxResult.Yes)
                 {
                     Process.Start(pathToFilm);
@@ -92,7 +92,7 @@ namespace Filmoteka_WPF
             switch (comboBoxFilter.SelectedIndex)
             {
                 case 0:
-                    foreach (int rok in _filmoteka.GetRoky())
+                    foreach (int rok in _filmoteka.GetYears())
                     {
                         ComboBoxItem item = new ComboBoxItem();
                         item.Content = rok;
@@ -101,7 +101,7 @@ namespace Filmoteka_WPF
                     break;
 
                 case 1:
-                    foreach (string zanr in _filmoteka.GetZanry())
+                    foreach (string zanr in _filmoteka.GetGenres())
                     {
                         ComboBoxItem item = new ComboBoxItem();
                         item.Content = zanr;
@@ -148,7 +148,7 @@ namespace Filmoteka_WPF
             else
             {
                 Film film = (Film)listBoxFilmy.SelectedItem;
-                AddFilm editFilm = new AddFilm(_filmoteka.GetZanry(), _filmoteka.GetRoky(), film.Nazev, film.Filename, film.Rok, film.Zanr.ToArray(), film.Popis);
+                AddFilm editFilm = new AddFilm(_filmoteka.GetGenres(), _filmoteka.GetYears(), film.Name, film.Filename, film.Year, film.Genres.ToArray(), film.Description);
                 editFilm.Title = "Upravit film";
                 if (editFilm.ShowDialog() == true && editFilm.DialogResult == true)
                 {
@@ -262,13 +262,13 @@ namespace Filmoteka_WPF
             else
             {
                 Film film = (Film)listBoxFilmy.SelectedItem;
-                tbFilm.Text = film.Nazev;
-                tbRok.Text = film.Rok.ToString();
-                tbPopis.Text = film.Popis;
+                tbFilm.Text = film.Name;
+                tbRok.Text = film.Year.ToString();
+                tbPopis.Text = film.Description;
                 tbZanr.Text = string.Empty;
-                foreach (string z in film.Zanr)
+                foreach (string z in film.Genres)
                 {
-                    if (film.Zanr.IndexOf(z) == film.Zanr.Count - 1)
+                    if (film.Genres.IndexOf(z) == film.Genres.Count - 1)
                     {
                         tbZanr.Text += z;
                     }
@@ -353,7 +353,7 @@ namespace Filmoteka_WPF
             else
             {
                 Film filmToRemove = (Film)listBoxFilmy.SelectedItem;
-                MessageBoxResult result = MessageBox.Show($"Chcete film {filmToRemove.Nazev} vymazat?", string.Empty, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                MessageBoxResult result = MessageBox.Show($"Chcete film {filmToRemove.Name} vymazat?", string.Empty, MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     _filmoteka.RemoveFilm(filmToRemove);
