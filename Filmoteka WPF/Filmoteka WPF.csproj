@@ -158,6 +158,7 @@
     <Compile Include="AutoAdd.cs" />
     <Compile Include="Export.cs" />
     <Compile Include="Files.cs" />
+    <Compile Include="FilmException.cs" />
     <Compile Include="OtherOptions.xaml.cs">
       <DependentUpon>OtherOptions.xaml</DependentUpon>
     </Compile>

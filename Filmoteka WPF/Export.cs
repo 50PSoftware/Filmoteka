@@ -11,13 +11,13 @@
 
         public void ToJSON(string exportFilename)
         {
-            JSONFile json = new JSONFile(exportFilename);
+            var json = new JSONFile(exportFilename);
             json.Save(_source);
         }
 
         public void ToXML(string exportFilename)
         {
-            XMLFile xml = new XMLFile(exportFilename);
+            var xml = new XMLFile(exportFilename);
             xml.Save(_source);
         }
     }

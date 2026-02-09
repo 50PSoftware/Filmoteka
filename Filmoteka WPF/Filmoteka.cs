@@ -14,7 +14,7 @@ namespace Filmoteka_WPF
         public Filmoteka(string FilenameOrConnectionString, bool NewFile = false)
         {
             _films = new List<Film>();
-            LocalFiles localFiles = new LocalFiles(true);
+            var localFiles = new LocalFiles(true);
             if (NewFile)
             {
                 switch (new FileInfo(FilenameOrConnectionString).Extension)
@@ -53,7 +53,7 @@ namespace Filmoteka_WPF
 
         public void AddFilm(string name, string filename, string description, string[] genres, int year)
         {
-            Film film = new Film(name, filename, genres, year, description);
+            var film = new Film(name, filename, genres, year, description);
             _films.Add(film);
         }
 
@@ -62,12 +62,12 @@ namespace Filmoteka_WPF
             if (this._films.Count == 0)
                 this._films.AddRange(films);
             else
-                throw new Exception($"Films collection is not empty! Count: {this._films.Count}");
+                throw new FilmException($"Films collection is not empty! Count: {this._films.Count}");
         }
 
         public void AutoAddFilms()
         {
-            Film[] films = AutoAdd.GetFilms(Folder);
+            var films = AutoAdd.GetFilms(Folder);
             foreach (Film film in films)
             {
                 bool isAlreadyInFileOrDatabase = false;
@@ -96,7 +96,7 @@ namespace Filmoteka_WPF
 
         public Film[] GetFilmsByGenre(string[] zanr)
         {
-            List<Film> result = new List<Film>();
+            var result = new List<Film>();
             for (int i = 0; i < zanr.Length; i++)
             {
                 var query = from film in _films where film.Genres.Contains(zanr[i]) select film;
@@ -115,7 +115,7 @@ namespace Filmoteka_WPF
         public Film[] GetFilmsByYear(int rok)
         {
             var query = from film in _films where film.Year == rok select film;
-            List<Film> result = new List<Film>();
+            var result = new List<Film>();
             foreach (Film film1 in query)
             {
                 result.Add(film1);
@@ -141,20 +141,20 @@ namespace Filmoteka_WPF
 
         public void RemoveFilm(int index)
         {
-            Film filmToDelete = _films[index];
+            var filmToDelete = _films[index];
             _films.RemoveAt(index);
         }
 
         public void UpdateFilm(Film film, string name, string filename, string description, string[] genres, int year)
         {
             var query = from _film in _films where _film.Filename == film.Filename select _film;
-            foreach (Film f in query)
+            foreach (var filmInQuery in query)
             {
-                f.SetName(name);
-                f.SetDescription(description);
-                f.SetFilename(filename);
-                f.SetYear(year);
-                f.SetGenres(new List<string>(genres));
+                film.Name = name;
+                film.Description = description;
+                film.Filename = filename;
+                film.Year = year;
+                film.Genres = new List<string>(genres);
             }
         }
     }
@@ -183,41 +183,11 @@ namespace Filmoteka_WPF
         public Film()
         { }
 
-        public string Filename { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public int Year { get; private set; }
-        public List<string> Genres { get; private set; }
-
-        public void AddGenre(string zanr)
-        {
-            Genres.Add(zanr);
-        }
-
-        public void SetFilename(string filename)
-        {
-            this.Filename = filename;
-        }
-
-        public void SetName(string nazev)
-        {
-            this.Name = nazev;
-        }
-
-        public void SetDescription(string popis)
-        {
-            this.Description = popis;
-        }
-
-        public void SetYear(int rok)
-        {
-            this.Year = rok;
-        }
-
-        public void SetGenres(List<string> zanr)
-        {
-            this.Genres = zanr;
-        }
+        public string Filename { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int Year { get; set; }
+        public List<string> Genres { get; set; }
 
         public override string ToString()
         {
