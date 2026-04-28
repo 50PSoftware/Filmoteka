@@ -15,7 +15,7 @@ namespace Filmoteka_WPF
         private string _path;
         private bool _selectionChanged;
         private Settings _settings;
-        private List<string> _selections = new List<string>();
+        private readonly List<string> _selections = new List<string>();
 
         public MainWindow()
         {
@@ -41,6 +41,7 @@ namespace Filmoteka_WPF
                 EmptyTextBoxes();
                 listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
                 listBoxFilmy.Items.Refresh();
+                CheckFilmCollectionEmptiness();
             }
         }
 
@@ -149,21 +150,18 @@ namespace Filmoteka_WPF
         private void EditFilm_Click(object sender, RoutedEventArgs e)
         {
             if (listBoxFilmy.SelectedIndex < 0)
-            {
                 return;
-            }
-            else
+
+            var film = (Film)listBoxFilmy.SelectedItem;
+            var editFilm = new AddFilm(_filmoteka.GetGenres(), _filmoteka.GetYears(), film.Name, film.Filename, film.Year, film.Genres.ToArray(), film.Description);
+            editFilm.Title = "Upravit film";
+            if (editFilm.ShowDialog() == true && editFilm.DialogResult == true)
             {
-                var film = (Film)listBoxFilmy.SelectedItem;
-                var editFilm = new AddFilm(_filmoteka.GetGenres(), _filmoteka.GetYears(), film.Name, film.Filename, film.Year, film.Genres.ToArray(), film.Description);
-                editFilm.Title = "Upravit film";
-                if (editFilm.ShowDialog() == true && editFilm.DialogResult == true)
-                {
-                    _filmoteka.UpdateFilm(film, editFilm.FilmName, editFilm.Filename, editFilm.Describtion, editFilm.Genres, editFilm.Year);
-                    EmptyTextBoxes();
-                    listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
-                    listBoxFilmy.Items.Refresh();
-                }
+                _filmoteka.UpdateFilm(film, editFilm.FilmName, editFilm.Filename, editFilm.Describtion, editFilm.Genres, editFilm.Year);
+                EmptyTextBoxes();
+                listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
+                listBoxFilmy.Items.Refresh();
+                CheckFilmCollectionEmptiness();
             }
         }
 
@@ -198,6 +196,8 @@ namespace Filmoteka_WPF
 
         private void Filmoteka_FilmsAutoAdded(object sender, FilmotekaEventArgs e)
         {
+            CheckFileEmptines();
+            CheckFilmCollectionEmptiness();
             MessageBox.Show("Byly automaticky přidány filmy!", String.Empty, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -262,6 +262,39 @@ namespace Filmoteka_WPF
             }
         }
 
+        /// <summary>
+        /// Checks if file is empty. If so, then set file menu items.
+        /// </summary>
+        /// <param name="filename"></param>
+        private void CheckFileEmptines(string filename = null)
+        {
+            filename = filename == null ? _settings.Filename : filename;
+            var localfilms = new Filmoteka(filename).GetFilms().Length;
+            if (localfilms == 0)
+            {
+                saveFileMenuItem.IsEnabled = false;
+            }
+            else
+            {
+                saveFileMenuItem.IsEnabled = true;
+            }
+        }
+
+        private void CheckFilmCollectionEmptiness()
+        {
+            if (_filmoteka.GetFilms().Length == 0)
+            {
+                editFilmMeniItem.IsEnabled = false;
+                removeFilmMeniItem.IsEnabled = false;
+                loadFileMenuItem.IsEnabled = false;
+            }
+            else
+            {
+                editFilmMeniItem.IsEnabled = true;
+                removeFilmMeniItem.IsEnabled = true;
+            }
+        }
+
         private void ListBoxFilmy_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EmptyTextBoxes();
@@ -304,6 +337,8 @@ namespace Filmoteka_WPF
                 filename = _settings.Filename;
             }
 
+            CheckFileEmptines(filename);
+
             _filmoteka = new Filmoteka(filename, newFile);
             _filmoteka.FilmsAutoAdded += Filmoteka_FilmsAutoAdded;
 
@@ -336,6 +371,8 @@ namespace Filmoteka_WPF
 
             btnEraseFilter.IsEnabled = false;
             listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
+
+            CheckFilmCollectionEmptiness();
         }
 
         private void LoadFile_Click(object sender, RoutedEventArgs e)
@@ -354,6 +391,7 @@ namespace Filmoteka_WPF
 
             listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
             listBoxFilmy.Items.Refresh();
+            CheckFilmCollectionEmptiness();
         }
 
         private void RemoveFilm_Click(object sender, RoutedEventArgs e)
@@ -373,6 +411,7 @@ namespace Filmoteka_WPF
                     EmptyTextBoxes();
                     listBoxFilmy.ItemsSource = _filmoteka.GetFilms();
                     listBoxFilmy.Items.Refresh();
+                    CheckFilmCollectionEmptiness();
                 }
             }
         }
