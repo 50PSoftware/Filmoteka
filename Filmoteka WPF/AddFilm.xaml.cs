@@ -40,10 +40,10 @@ namespace Filmoteka_WPF
 
         private void BtnAddGenre_Click(object sender, RoutedEventArgs e)
         {
-            if (listBoxGenres.SelectedItem != null)
+            if (listBoxGenres.SelectedItem is string selectedGenre)
             {
-                listBoxSelectedGenres.Items.Add(listBoxGenres.SelectedItem);
-                genres.Remove((string)listBoxGenres.SelectedItem);
+                listBoxSelectedGenres.Items.Add(selectedGenre);
+                genres.Remove(selectedGenre);
                 genres.Sort();
                 listBoxGenres.Items.Refresh();
             }

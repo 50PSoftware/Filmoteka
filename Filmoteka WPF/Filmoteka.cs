@@ -74,7 +74,6 @@ namespace Filmoteka_WPF
                 var query = from _film in this._films where _film.Filename == film.Filename select _film;
                 foreach (Film filmQuery in query)
                 {
-                    System.Windows.MessageBox.Show($"Tento film ({film.Name}) je již v databázi!");
                     isAlreadyInFileOrDatabase = true;
                 }
                 if (!isAlreadyInFileOrDatabase)

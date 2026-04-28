@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using _50P.Software.Settings.Dialogs;
@@ -275,17 +276,20 @@ namespace Filmoteka_WPF
                 tbRok.Text = film.Year.ToString();
                 tbPopis.Text = film.Description;
                 tbZanr.Text = string.Empty;
+                var sb = new StringBuilder();
                 foreach (var genre in film.Genres)
                 {
                     if (film.Genres.IndexOf(genre) == film.Genres.Count - 1)
                     {
-                        tbZanr.Text += genre;
+                        sb.Append(genre);
                     }
                     else
                     {
-                        tbZanr.Text += $"{genre} \\ ";
+                        sb.Append(genre).Append("\\");
                     }
                 }
+
+                tbZanr.Text = sb.ToString();
             }
         }
 
