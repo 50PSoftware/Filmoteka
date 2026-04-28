@@ -286,12 +286,13 @@ namespace Filmoteka_WPF
             {
                 editFilmMeniItem.IsEnabled = false;
                 removeFilmMeniItem.IsEnabled = false;
-                loadFileMenuItem.IsEnabled = false;
+                saveFileMenuItem.IsEnabled = false;
             }
             else
             {
                 editFilmMeniItem.IsEnabled = true;
                 removeFilmMeniItem.IsEnabled = true;
+                saveFileMenuItem.IsEnabled = true;
             }
         }
 
