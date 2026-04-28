@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("50PSoftware")]
 [assembly: AssemblyProduct("Filmoteka WPF")]
-[assembly: AssemblyCopyright("Copyright © 50PSoftware 2022")]
+[assembly: AssemblyCopyright("Copyright © 50PSoftware 2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -47,5 +47,5 @@ using System.Windows;
 // Můžete zadat všechny hodnoty nebo nastavit výchozí číslo buildu a revize pomocí *, jak je vidět níže:
 // pomocí zástupného znaku * takto:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.4.3")]
-[assembly: AssemblyFileVersion("1.4.3")]
+[assembly: AssemblyVersion("1.4.4")]
+[assembly: AssemblyFileVersion("1.4.4")]
