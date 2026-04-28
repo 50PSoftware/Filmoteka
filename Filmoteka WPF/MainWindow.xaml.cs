@@ -272,11 +272,11 @@ namespace Filmoteka_WPF
             var localfilms = new Filmoteka(filename).GetFilms().Length;
             if (localfilms == 0)
             {
-                saveFileMenuItem.IsEnabled = false;
+                loadFileMenuItem.IsEnabled = false;
             }
             else
             {
-                saveFileMenuItem.IsEnabled = true;
+                loadFileMenuItem.IsEnabled = true;
             }
         }
 
